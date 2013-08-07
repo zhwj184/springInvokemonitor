@@ -22,14 +22,15 @@ public class LSHandler implements CommandHandler {
      */
     @Override
     public String handle() {
+    	String cr = System.getProperty("os.name").matches("(W|w)indows.*") ? "\r\n" : "\n";
         logger.info("running the follwoing commnad:" + command);
         BeanFactory beanFactory = ServiceContext.getBeanFactory();
-        String beanNameOrType = command.substring(command.indexOf(" "));
+        String beanNameOrType = command.substring(command.indexOf(" ") + 1);
         Object obj = beanFactory.getBean(beanNameOrType);
         StringBuilder builder = new StringBuilder();
         Method[] methods = obj.getClass().getMethods();
         for(Method method: methods){
-        	builder.append(method.getReturnType().getName() + " " + obj.getClass().getName() + "." + method.getName());
+        	builder.append(method.getReturnType().getName() + " " + obj.getClass().getName() + "." + method.getName() + "(");
         	Class<?>[] cls = method.getParameterTypes();
         	for(int i = 0; i < cls.length; i++){
         		if(i != cls.length - 1){
@@ -38,7 +39,7 @@ public class LSHandler implements CommandHandler {
         			builder.append(cls[i].getName());
         		}
         	}
-        	builder.append("\n");
+        	builder.append(")" + cr);
         }
         return builder.toString();
 

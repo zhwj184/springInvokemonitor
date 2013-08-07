@@ -26,15 +26,12 @@ public class UnknownCommandHandler implements CommandHandler {
         builder.append(cr);
         builder.append("Here are the list of commands you could run:");
         builder.append(cr);
-        builder.append("cd [directory name]");
+        builder.append("ls [beanname]");
         builder.append(cr);
-        builder.append("ls");
+        builder.append("invoke beanname.method(param1,param2)");
         builder.append(cr);
-        builder.append("mkdir");
+        builder.append("exit");
         builder.append(cr);
-        builder.append("status");
-        builder.append(cr);
-        builder.append("pwd");
         return builder.toString();
     }
 

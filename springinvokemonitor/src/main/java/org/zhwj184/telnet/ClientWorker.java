@@ -14,62 +14,75 @@ import org.zhwj184.telnet.command.ExitHandler;
 
 public class ClientWorker implements Runnable {
 
-    private final Socket socket;
-    private final Logger logger = Logger.getLogger(ClientWorker.class.getName());
+	private final Socket socket;
+	private final Logger logger = Logger
+			.getLogger(ClientWorker.class.getName());
 
-    /**
-     * @param socket
-     */
-    public ClientWorker(final Socket socket) {
-        this.socket = socket;
-    }
+	/**
+	 * @param socket
+	 */
+	public ClientWorker(final Socket socket) {
+		this.socket = socket;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
-    @Override
-    public void run() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run() {
 
-        try {
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+		try {
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // display welcome screen
-            out.println(Util.buildWelcomeScreen());
+			// display welcome screen
+			out.println(Util.buildWelcomeScreen());
 
-            boolean cancel = false;
-            CommandHandlerFactory fac = CommandHandlerFactory.getInstance();
-            while (!cancel) {
+			boolean cancel = false;
+			CommandHandlerFactory fac = CommandHandlerFactory.getInstance();
+			while (!cancel) {
+				try {
+					final String command = reader.readLine();
+					if (command == null) {
+						continue;
+					}
 
-                final String command = reader.readLine();
-                if (command == null) {
-                    continue;
-                }
+					// handle the command
+					final CommandHandler handler = fac.getHandler(command);
+					String response = handler.handle();
 
-                //handle the command
-                final CommandHandler handler = fac.getHandler(command);
-                String response = handler.handle();
+					out.println(response);
 
-                out.println(response);
+					// command issuing an exit.
+					if (handler instanceof ExitHandler) {
+						cancel = true;
+					}
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, e.getMessage(), e);
+				}
 
-                // command issuing an exit.
-                if (handler instanceof ExitHandler) {
-                    cancel = true;
-                }
+			}
+			if (cancel) {
+				try {
+					socket.close();
+				} catch (IOException e) {
+					logger.log(Level.SEVERE, "Failed to close the socket", e);
 
-            }
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to close the socket", e);
+				}
+			}
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Failed to close the socket", e);
+		}finally{
+			try {
+				socket.close();
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "Failed to close the socket", e);
 
-            }
-        }
-    }
+			}
+		}
+
+	}
 
 }

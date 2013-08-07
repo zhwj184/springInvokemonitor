@@ -18,8 +18,8 @@ public class InvokeHandler implements CommandHandler {
 	@Override
 	public String handle() {
 		BeanFactory beanFactory = ServiceContext.getBeanFactory();
-		String beanNameOrType = command.substring(0,command.substring(0,command.indexOf("(")).lastIndexOf("."));
-		String methodName =command.substring(command.substring(0,command.indexOf("(")).lastIndexOf("."),command.indexOf("("));
+		String beanNameOrType = command.substring(command.indexOf(" ") + 1,command.substring(0,command.indexOf("(")).lastIndexOf("."));
+		String methodName =command.substring(command.substring(0,command.indexOf("(")).lastIndexOf(".") + 1,command.indexOf("("));
 		Object obj = beanFactory.getBean(beanNameOrType);
 		StringBuilder builder = new StringBuilder();
 		Method[] methods = obj.getClass().getMethods();
@@ -27,10 +27,10 @@ public class InvokeHandler implements CommandHandler {
 			if(!methodName.equals(method.getName())){
 				continue;
 			}
-			builder.append(method.getReturnType().getName() + " "
-					+ obj.getClass().getName() + "." + method.getName());
+//			builder.append(method.getReturnType().getName() + " "
+//					+ obj.getClass().getName() + "." + method.getName());
 			Class<?>[] cls = method.getParameterTypes();
-			String[] paraStr = command.substring(command.indexOf("(") + 1, command.lastIndexOf("")).split(",");
+			String[] paraStr = command.substring(command.indexOf("(") + 1, command.lastIndexOf(")")).split(";");
 			Object[] para = new Object[cls.length];
 			for (int i = 0; i < cls.length; i++) {
 				if(cls[i].isPrimitive()){
@@ -64,11 +64,11 @@ public class InvokeHandler implements CommandHandler {
 			long start = System.currentTimeMillis();
 			try {
 				Object ret = method.invoke(obj, para);
-				builder.append(JSON.toJSON(ret) + "\n");
+				builder.append("result:" + ret.getClass().getName() + " " + JSON.toJSON(ret));
 			} catch (Exception e) {
 			} 
 			long end = System.currentTimeMillis();
-			builder.append((end - start) + "\n");
+			builder.append("\r\nrun time: " + (end - start) + "ms\n");
 			return builder.toString();
 		}
 		return "there is no such method!";
