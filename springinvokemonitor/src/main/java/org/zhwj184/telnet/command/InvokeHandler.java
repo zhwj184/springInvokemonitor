@@ -66,6 +66,7 @@ public class InvokeHandler implements CommandHandler {
 				Object ret = method.invoke(obj, para);
 				builder.append("result:" + ret.getClass().getName() + " " + JSON.toJSON(ret));
 			} catch (Exception e) {
+				builder.append(e);
 			} 
 			long end = System.currentTimeMillis();
 			builder.append("\r\nrun time: " + (end - start) + "ms\n");
