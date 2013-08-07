@@ -28,7 +28,7 @@ public class UnknownCommandHandler implements CommandHandler {
         builder.append(cr);
         builder.append("ls [beanname]");
         builder.append(cr);
-        builder.append("invoke beanname.method(param1,param2)");
+        builder.append("invoke beanname.method(param1;param2)");
         builder.append(cr);
         builder.append("exit");
         builder.append(cr);
